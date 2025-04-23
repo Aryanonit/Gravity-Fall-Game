@@ -48,7 +48,7 @@
     border-radius: 5px;
 }
 
-/* Add this to styles.css */
+
 #gameContainer {
     /* ... existing styles ... */
     touch-action: none; /* Prevents default touch actions like scrolling */
