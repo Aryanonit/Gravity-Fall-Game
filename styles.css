@@ -1,3 +1,15 @@
+/* Base body styles for centering the game */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #121212;
+    font-family: 'Arial', sans-serif;
+}
+
 /* Base game container styles */
 #gameContainer {
     width: 400px;
@@ -9,6 +21,7 @@
     user-select: none; /* Prevents text selection during swipes */
     /* Modern gradient background */
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    margin: 0 auto; /* Center horizontally */
 }
 
 /* Ball styles */
@@ -86,6 +99,7 @@
     color: white;
     text-shadow: 0 0 10px rgba(255,255,255,0.5);
     z-index: 100;
+    font-family: 'Arial', sans-serif;
 }
 
 /* Main Menu Styles */
@@ -110,12 +124,15 @@
     gap: 20px;
     width: 80%;
     max-width: 400px;
+    font-family: 'Arial', sans-serif;
 }
 
 #mainMenu h1 {
     font-size: 3em;
     margin-bottom: 30px;
     text-shadow: 0 0 10px rgba(255,255,255,0.3);
+    font-family: 'Arial', sans-serif;
+    letter-spacing: 1px;
 }
 
 #newGame {
@@ -147,6 +164,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-family: 'Arial', sans-serif;
 }
 
 #sensitivity, #difficulty {
@@ -162,11 +180,13 @@
 #highScores h3 {
     margin-top: 0;
     text-align: center;
+    font-family: 'Arial', sans-serif;
 }
 
 #scoreList {
     margin: 0;
     padding-left: 20px;
+    font-family: 'Arial', sans-serif;
 }
 
 #scoreList li {
@@ -187,6 +207,7 @@
     padding: 20px;
     z-index: 300;
     text-align: center;
+    font-family: 'Arial', sans-serif;
 }
 
 #highScoresList {

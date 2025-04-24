@@ -25,14 +25,22 @@ function startGame() {
     
     // Hide main menu
     document.getElementById('mainMenu').style.display = 'none';
-    showCountdown();
     
-    updateDifficulty();
-    
+    // Start with game inactive but show countdown
+    gameActive = false;
+    showCountdown(function() {
+        // This callback will run after countdown completes
+        actuallyStartGame();
+    });
+}
+
+function actuallyStartGame() {
     gameActive = true;
     score = 0;
     scoreElement.textContent = `Score: ${score}`;
     startButton.style.display = 'none';
+    
+    updateDifficulty();
     
     // Reset ball position
     ballPosition = { x: 200, y: 50 };
@@ -109,7 +117,7 @@ function updateGame() {
         
         const platformX = parseInt(platform.style.left);
         
-        // Improved collision detection
+        // Improved collision detection with reduced bounce
         if (ballPosition.y + 20 >= platformY && 
             ballPosition.y <= platformY + 20 &&
             ballPosition.x + 20 >= platformX && 
@@ -118,7 +126,7 @@ function updateGame() {
             if (velocity.y > 0) { // Only land when falling
                 isOnPlatform = true;
                 ballPosition.y = platformY - 20;
-                velocity.y = -2;
+                velocity.y = -1; // Reduced from -2 to -1 for less bounce
                 addLandingEffect(platformX, platformY);
             }
         }
@@ -188,7 +196,7 @@ function endGame() {
     }, 100);
 }
 
-function showCountdown() {
+function showCountdown(callback) {
     const countdownElement = document.querySelector('.countdown');
     if (!countdownElement) return; // Ensure the element exists
     
@@ -206,6 +214,8 @@ function showCountdown() {
             setTimeout(() => {
                 countdownElement.style.display = 'none';
                 countdownElement.textContent = '';
+                // Call the callback function after countdown is completely done
+                if (callback) callback();
             }, 500);
         } else {
             countdownElement.textContent = count;
