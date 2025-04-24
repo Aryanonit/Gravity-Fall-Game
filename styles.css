@@ -1,13 +1,17 @@
-/* styles.css */
+/* Base game container styles */
 #gameContainer {
     width: 400px;
     height: 600px;
     border: 2px solid black;
     position: relative;
     overflow: hidden;
-    background-color: #87CEEB;
+    touch-action: none; /* Prevents default touch actions like scrolling */
+    user-select: none; /* Prevents text selection during swipes */
+    /* Modern gradient background */
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
 }
 
+/* Ball styles */
 #ball {
     width: 20px;
     height: 20px;
@@ -16,15 +20,23 @@
     position: absolute;
     left: 50%;
     top: 50px;
+    /* Animated ball */
+    box-shadow: 0 0 15px rgba(255,50,50,0.5);
+    transition: transform 0.2s;
 }
 
+/* Platform styles */
 .platform {
     width: 100px;
     height: 20px;
-    background-color: #4CAF50;
     position: absolute;
+    /* Platform animation */
+    background: linear-gradient(45deg, #00b4db, #0083b0);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
+/* Score display */
 #score {
     position: absolute;
     top: 10px;
@@ -34,6 +46,7 @@
     color: white;
 }
 
+/* Start button */
 #startButton {
     position: absolute;
     top: 50%;
@@ -48,9 +61,158 @@
     border-radius: 5px;
 }
 
+/* Landing effect */
+.landing-effect {
+    width: 100px;
+    height: 20px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+    position: absolute;
+    animation: pulse 0.5s ease-out;
+}
 
-#gameContainer {
-    /* ... existing styles ... */
-    touch-action: none; /* Prevents default touch actions like scrolling */
-    user-select: none; /* Prevents text selection during swipes */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Countdown overlay */
+.countdown {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4em;
+    color: white;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    z-index: 100;
+}
+
+/* Main Menu Styles */
+#mainMenu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #141E30 0%, #243B55 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    z-index: 200;
+}
+
+.menu-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 80%;
+    max-width: 400px;
+}
+
+#mainMenu h1 {
+    font-size: 3em;
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+#newGame {
+    padding: 15px;
+    font-size: 1.2em;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#newGame:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+
+.settings {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.settings label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#sensitivity, #difficulty {
+    width: 60%;
+}
+
+#highScores {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+#highScores h3 {
+    margin-top: 0;
+    text-align: center;
+}
+
+#scoreList {
+    margin: 0;
+    padding-left: 20px;
+}
+
+#scoreList li {
+    margin-bottom: 5px;
+}
+
+/* High Scores Menu */
+#highScoresMenu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 400px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+    z-index: 300;
+    text-align: center;
+}
+
+#highScoresList {
+    text-align: left;
+    margin: 20px 0;
+}
+
+#closeHighScores {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 500px) {
+    #gameContainer {
+        width: 100%;
+        height: 100vh;
+        border: none;
+    }
+    
+    #mainMenu {
+        width: 100%;
+        height: 100vh;
+    }
 }

@@ -1,20 +1,46 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html>
 <head>
     <title>Ball Landing Game</title>
     <link rel="stylesheet" href="styles.css">
-
-    
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 <body>
+    <div id="mainMenu">
+        <h1>Ball Drop</h1>
+        <div class="menu-content">
+            <button id="newGame">New Game</button>
+            <div class="settings">
+                <label>Sensitivity: <input type="range" id="sensitivity" min="1" max="10" value="5"></label>
+                <label>Difficulty: 
+                    <select id="difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </label>
+            </div>
+            <div id="highScores">
+                <h3>High Scores</h3>
+                <ol id="scoreList"></ol>
+            </div>
+        </div>
+    </div>
+    
     <div id="gameContainer">
         <div id="ball"></div>
         <div id="score">Score: 0</div>
         <button id="startButton">Start Game</button>
     </div>
+    
+    <div class="countdown"></div>
+    
+    <div id="highScoresMenu" style="display: none;">
+        <h2>High Scores</h2>
+        <ol id="highScoresList"></ol>
+        <button id="closeHighScores">Close</button>
+    </div>
+    
     <script src="game.js"></script>
 </body>
 </html>

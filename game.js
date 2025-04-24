@@ -1,12 +1,8 @@
-
 let touchStartX = null;
 let touchStartTime = null;
-const SWIPE_THRESHOLD = 50; // Min swipe distance in pixels kitna ho
-const SWIPE_TIMEOUT = 300; // Max time for a swipe in milliseconds 
-// 
-// 
-// 
-// 
+let SWIPE_THRESHOLD = 50; // Min swipe distance in pixels
+let SWIPE_TIMEOUT = 300; // Max time for a swipe in milliseconds 
+
 const ball = document.getElementById('ball');
 const gameContainer = document.getElementById('gameContainer');
 const scoreElement = document.getElementById('score');
@@ -17,23 +13,32 @@ let velocity = { x: 0, y: 0 };
 let gravity = 0.4;
 let score = 0;
 let gameLoop;
+let platformInterval;
 let platforms = [];
 let gameActive = false;
 let isOnPlatform = false;
+let difficulty = 'medium';
+let sensitivity = 5;
 
 function startGame() {
     if (gameActive) return;
+    
+    // Hide main menu
+    document.getElementById('mainMenu').style.display = 'none';
+    showCountdown();
+    
+    updateDifficulty();
     
     gameActive = true;
     score = 0;
     scoreElement.textContent = `Score: ${score}`;
     startButton.style.display = 'none';
     
-    // Reset ball position ke liye
+    // Reset ball position
     ballPosition = { x: 200, y: 50 };
     velocity = { x: 0, y: 0 };
     
-    // Clear existing platforms ki gir jaye
+    // Clear existing platforms
     platforms.forEach(platform => platform.remove());
     platforms = [];
     
@@ -41,8 +46,15 @@ function startGame() {
     createPlatform(200);
     createPlatform(400);
     
+    // Clear any existing intervals to prevent duplicate execution
+    clearInterval(gameLoop);
+    clearInterval(platformInterval);
+    
+    // Start the game loop
     gameLoop = setInterval(updateGame, 20);
-    setInterval(() => {
+    
+    // Start creating platforms periodically
+    platformInterval = setInterval(() => {
         if (gameActive) createPlatform(600);
     }, 2000);
 }
@@ -78,8 +90,11 @@ function updateGame() {
     // Reset platform check
     isOnPlatform = false;
     
+    // Create a copy of the platforms array to avoid modification issues during iteration
+    const platformsCopy = [...platforms];
+    
     // Move and check platforms
-    platforms.forEach((platform, index) => {
+    platformsCopy.forEach((platform, index) => {
         // Move platform up
         let platformY = parseInt(platform.style.top) - 2;
         platform.style.top = platformY + 'px';
@@ -92,11 +107,20 @@ function updateGame() {
             scoreElement.textContent = `Score: ${score}`;
         }
         
-        // Check if ball is on this platform
-        if (checkLanding(platform)) {
-            isOnPlatform = true;
-            ballPosition.y = platformY - 20; // Place ball on top of platform
-            velocity.y = -2; // Match platform speed
+        const platformX = parseInt(platform.style.left);
+        
+        // Improved collision detection
+        if (ballPosition.y + 20 >= platformY && 
+            ballPosition.y <= platformY + 20 &&
+            ballPosition.x + 20 >= platformX && 
+            ballPosition.x <= platformX + 100) {
+            
+            if (velocity.y > 0) { // Only land when falling
+                isOnPlatform = true;
+                ballPosition.y = platformY - 20;
+                velocity.y = -2;
+                addLandingEffect(platformX, platformY);
+            }
         }
     });
 
@@ -126,6 +150,15 @@ function createPlatform(startY) {
     platforms.push(platform);
 }
 
+function addLandingEffect(x, y) {
+    const effect = document.createElement('div');
+    effect.className = 'landing-effect';
+    effect.style.left = x + 'px';
+    effect.style.top = y + 'px';
+    gameContainer.appendChild(effect);
+    setTimeout(() => effect.remove(), 500);
+}
+
 function checkLanding(platform) {
     const platformRect = platform.getBoundingClientRect();
     const ballBottom = ballPosition.y + 20;
@@ -143,8 +176,95 @@ function checkLanding(platform) {
 function endGame() {
     gameActive = false;
     clearInterval(gameLoop);
+    clearInterval(platformInterval);
     startButton.style.display = 'block';
-    alert(`Game Over! Score: ${score}`);
+    
+    // Update high scores before showing alert
+    updateHighScores();
+    
+    // Use a timeout to allow the UI to update before showing alert
+    setTimeout(() => {
+        alert(`Game Over! Score: ${score}`);
+    }, 100);
+}
+
+function showCountdown() {
+    const countdownElement = document.querySelector('.countdown');
+    if (!countdownElement) return; // Ensure the element exists
+    
+    let count = 3;
+    countdownElement.textContent = count;
+    countdownElement.style.display = 'block';
+    
+    const countdownInterval = setInterval(() => {
+        count--;
+        
+        if (count < 0) {
+            clearInterval(countdownInterval);
+            countdownElement.textContent = 'GO!';
+            
+            setTimeout(() => {
+                countdownElement.style.display = 'none';
+                countdownElement.textContent = '';
+            }, 500);
+        } else {
+            countdownElement.textContent = count;
+        }
+    }, 1000);
+}
+
+function updateDifficulty() {
+    switch(difficulty) {
+        case 'easy':
+            gravity = 0.3;
+            SWIPE_THRESHOLD = 40;
+            break;
+        case 'medium':
+            gravity = 0.4;
+            SWIPE_THRESHOLD = 50;
+            break;
+        case 'hard':
+            gravity = 0.5;
+            SWIPE_THRESHOLD = 60;
+            break;
+    }
+}
+
+function updateHighScores() {
+    const scores = JSON.parse(localStorage.getItem('highScores')) || [];
+    
+    // Add current score
+    scores.push({
+        score: score,
+        date: new Date().toLocaleDateString()
+    });
+    
+    // Sort scores in descending order
+    scores.sort((a, b) => b.score - a.score);
+    
+    // Keep only top 10 scores
+    const topScores = scores.slice(0, 10);
+    
+    // Save back to localStorage
+    localStorage.setItem('highScores', JSON.stringify(topScores));
+    
+    // Display high scores
+    displayHighScores(topScores);
+}
+
+function displayHighScores(scores) {
+    const highScoresList = document.getElementById('highScoresList');
+    if (!highScoresList) return;
+    
+    highScoresList.innerHTML = '';
+    
+    scores.forEach((scoreData, index) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${index + 1}. Score: ${scoreData.score} - ${scoreData.date}`;
+        highScoresList.appendChild(listItem);
+    });
+    
+    document.getElementById('highScoresMenu').style.display = 'block';
 }
 
 // Control with arrow keys
@@ -153,10 +273,10 @@ document.addEventListener('keydown', (event) => {
     
     switch(event.key) {
         case 'ArrowLeft':
-            velocity.x = -5;
+            velocity.x = -sensitivity;
             break;
         case 'ArrowRight':
-            velocity.x = 5;
+            velocity.x = sensitivity;
             break;
     }
 });
@@ -166,8 +286,6 @@ document.addEventListener('keyup', (event) => {
         velocity.x = 0;
     }
 });
-
-startButton.addEventListener('click', startGame);
 
 // touch event listeners
 gameContainer.addEventListener('touchstart', (event) => {
@@ -186,9 +304,9 @@ gameContainer.addEventListener('touchmove', (event) => {
     
     // Move ball based on touch position difference
     if (touchDifferenceX > 0) {
-        velocity.x = 5; // Move right
+        velocity.x = sensitivity; // Move right
     } else if (touchDifferenceX < 0) {
-        velocity.x = -5; // Move left
+        velocity.x = -sensitivity; // Move left
     }
 });
 
@@ -212,4 +330,63 @@ gameContainer.addEventListener('touchend', (event) => {
     
     touchStartX = null;
     touchStartTime = null;
+});
+
+// Initialize event listeners when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Start button click event
+    if (startButton) {
+        startButton.addEventListener('click', startGame);
+    }
+    
+    // Connect the New Game button to the startGame function
+    const newGameButton = document.getElementById('newGame');
+    if (newGameButton) {
+        newGameButton.addEventListener('click', () => {
+            startGame();
+        });
+    }
+    
+    // Update sensitivity when the slider changes
+    const sensitivitySlider = document.getElementById('sensitivity');
+    if (sensitivitySlider) {
+        sensitivity = parseInt(sensitivitySlider.value);
+        sensitivitySlider.addEventListener('input', (event) => {
+            sensitivity = parseInt(event.target.value);
+        });
+    }
+    
+    // Update difficulty when the dropdown changes
+    const difficultySelect = document.getElementById('difficulty');
+    if (difficultySelect) {
+        difficulty = difficultySelect.value;
+        difficultySelect.addEventListener('change', (event) => {
+            difficulty = event.target.value;
+            updateDifficulty();
+        });
+    }
+    
+    // Close high scores button functionality
+    const closeHighScoresButton = document.getElementById('closeHighScores');
+    if (closeHighScoresButton) {
+        closeHighScoresButton.addEventListener('click', () => {
+            document.getElementById('highScoresMenu').style.display = 'none';
+        });
+    }
+    
+    // Load and display high scores
+    const savedScores = JSON.parse(localStorage.getItem('highScores')) || [];
+    if (savedScores.length > 0) {
+        // Update the main menu score list
+        const scoreList = document.getElementById('scoreList');
+        if (scoreList) {
+            scoreList.innerHTML = '';
+            
+            savedScores.slice(0, 5).forEach((scoreData, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${scoreData.score} - ${scoreData.date}`;
+                scoreList.appendChild(listItem);
+            });
+        }
+    }
 });
